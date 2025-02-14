@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
-
+const User = require("./models/User");
 const app = express();
 
 // Middleware
@@ -15,8 +15,14 @@ app.use(cookieParser());
 // CORS configuration
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Your frontend URL
-    credentials: true
+    origin: [
+      "https://ecofarmiq.vercel.app", // Production frontend
+      "http://localhost:5173", // Development frontend
+      "http://localhost:3000", // Alternative development port
+    ],
+    credentials: true, // Allow credentials (cookies)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
@@ -33,7 +39,14 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("EcoFarms API, if you want to get the Website link visit: https://ecofarmiq.vercel.app/");
+  res.send(
+    "EcoFarms API, if you want to get the Website link visit: https://ecofarmiq.vercel.app/"
+  );
+});
+
+app.get("/api/auth/users", async (req, res) => {
+  const users = await User.find();
+  res.json(users);
 });
 
 // Handle undefined routes
