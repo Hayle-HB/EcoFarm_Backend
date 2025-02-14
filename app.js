@@ -32,6 +32,10 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("EcoFarms API, if you want to get the Website link visit: https://ecofarmiq.vercel.app/");
+});
+
 // Handle undefined routes
 // app.use("*", (req, res) => {
 //   res.status(404).json({
