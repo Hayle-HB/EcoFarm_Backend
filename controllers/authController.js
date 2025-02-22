@@ -140,10 +140,10 @@ exports.logout = async (req, res) => {
 };
 
 exports.users = async (req, res) => {
+  const users = await User.find();
   res.status(200).json({
-    name: "John",
-    email: "john@gmail.com",
-    password: "123456",
+    status: "success",
+    data: users,
   });
 };
 
@@ -155,4 +155,65 @@ exports.getMe = async (req, res) => {
       user: req.user,
     },
   });
+};
+
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: {
+          _id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          createdAt: user.createdAt,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { firstName, lastName, email },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: {
+          _id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          createdAt: user.createdAt,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
 };
