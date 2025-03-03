@@ -14,11 +14,12 @@ exports.register = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(400).json({ 
         status: "error",
         message: "Email already in use",
       });
     }
+   
 
     // Create new user with first and last name
     const user = await User.create({
