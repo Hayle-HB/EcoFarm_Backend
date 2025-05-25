@@ -1,13 +1,14 @@
 require("dotenv").config();
-require("./config/MongoDB");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
+const MongoDB = require("./config/MongoDB");
 const User = require("./models/User");
 const app = express();
 
+MongoDB();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
@@ -17,6 +18,7 @@ app.use(
   cors({
     origin: [
       "https://ecofarmiq.vercel.app", // Production frontend
+      "https://ecofarmiq.proghubs.com", // Production frontend
       "http://localhost:5173", // Development frontend
       "http://localhost:3000", // Alternative development port
     ],
