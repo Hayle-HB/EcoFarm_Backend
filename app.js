@@ -12,21 +12,23 @@ MongoDB();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+// allow all cors
+app.use(cors());
 
 // CORS configuration
-app.use(
-  cors({
-    origin: [
-      "https://ecofarmiq.vercel.app", // Production frontend
-      "https://ecofarmiq.proghubs.com", // Production frontend
-      "http://localhost:5173", // Development frontend
-      "http://localhost:3000", // Alternative development port
-    ],
-    credentials: true, // Allow credentials (cookies)
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "https://ecofarmiq.vercel.app", // Production frontend
+//       "https://ecofarmiq.proghubs.com", // Production frontend
+//       "http://localhost:5173", // Development frontend
+//       "http://localhost:3000", // Alternative development port
+//     ],
+//     credentials: true, // Allow credentials (cookies)
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+//   })
+// );
 
 // Routes
 app.use("/api/auth", authRoutes);
