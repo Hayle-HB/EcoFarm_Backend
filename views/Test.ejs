@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pH Sensor Data Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .reading-card {
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+      }
+      .reading-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .alert-critical {
+        border-left: 4px solid #dc3545;
+      }
+      .alert-warning {
+        border-left: 4px solid #ffc107;
+      }
+      .alert-normal {
+        border-left: 4px solid #28a745;
+      }
+      .refresh-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-4">
+      <h1 class="mb-4">pH Sensor Data Dashboard</h1>
+
+      <!-- Filter Section -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Filter by Alert Level</h5>
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  onclick="filterByAlert('CRITICAL')"
+                >
+                  Critical
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-warning"
+                  onclick="filterByAlert('WARNING')"
+                >
+                  Warning
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-success"
+                  onclick="filterByAlert('NORMAL')"
+                >
+                  Normal
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  onclick="filterByAlert('ALL')"
+                >
+                  All
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Recent Readings</h5>
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  onclick="getRecentReadings(5)"
+                >
+                  Last 5
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  onclick="getRecentReadings(10)"
+                >
+                  Last 10
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  onclick="getRecentReadings(20)"
+                >
+                  Last 20
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Readings Display -->
+      <div class="row" id="readings-container">
+        <!-- Readings will be dynamically inserted here -->
+      </div>
+
+      <!-- Refresh Button -->
+      <button class="btn btn-primary refresh-btn" onclick="refreshData()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh Data
+      </button>
+    </div>
+
+    <script>
+      // Function to format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString();
+      }
+
+      // Function to get alert level class
+      function getAlertClass(alertLevel) {
+        switch (alertLevel) {
+          case "CRITICAL":
+            return "alert-critical";
+          case "WARNING":
+            return "alert-warning";
+          case "NORMAL":
+            return "alert-normal";
+          default:
+            return "";
+        }
+      }
+
+      // Function to create reading card
+      function createReadingCard(reading) {
+        return `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card reading-card ${getAlertClass(
+                      reading.alertLevel
+                    )}">
+                        <div class="card-body">
+                            <h5 class="card-title">pH: ${reading.value}</h5>
+                            <p class="card-text">
+                                <strong>Alert Level:</strong> ${
+                                  reading.alertLevel
+                                }<br>
+                                <strong>Time:</strong> ${formatDate(
+                                  reading.timestamp
+                                )}<br>
+                                <strong>Device:</strong> ${
+                                  reading.metadata?.deviceId || "Unknown"
+                                }<br>
+                                <strong>Location:</strong> ${
+                                  reading.metadata?.location || "Unknown"
+                                }<br>
+                                ${
+                                  reading.metadata?.temperature
+                                    ? `<strong>Temperature:</strong> ${reading.metadata.temperature}°C<br>`
+                                    : ""
+                                }
+                                ${
+                                  reading.metadata?.humidity
+                                    ? `<strong>Humidity:</strong> ${reading.metadata.humidity}%`
+                                    : ""
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      // Function to get recent readings
+      async function getRecentReadings(limit = 10) {
+        try {
+          const response = await fetch(
+            `/api/ph/readings/recent?limit=${limit}`
+          );
+          const readings = await response.json();
+          displayReadings(readings);
+        } catch (error) {
+          console.error("Error fetching recent readings:", error);
+        }
+      }
+
+      // Function to filter by alert level
+      async function filterByAlert(alertLevel) {
+        try {
+          const response = await fetch(`/api/ph/readings/alert/${alertLevel}`);
+          const readings = await response.json();
+          displayReadings(readings);
+        } catch (error) {
+          console.error("Error fetching readings by alert level:", error);
+        }
+      }
+
+      // Function to display readings
+      function displayReadings(readings) {
+        const container = document.getElementById("readings-container");
+        container.innerHTML = readings
+          .map((reading) => createReadingCard(reading))
+          .join("");
+      }
+
+      // Function to refresh all data
+      function refreshData() {
+        getRecentReadings(10);
+      }
+
+      // Initial load
+      document.addEventListener("DOMContentLoaded", () => {
+        getRecentReadings(10);
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

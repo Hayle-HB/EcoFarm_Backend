@@ -3,29 +3,39 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.9.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "helmet": "^8.0.0",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.516.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.0",
     "morgan": "^1.10.0",
     "mqtt": "^5.13.1",
     "npm": "^11.4.2",
     "passport": "^0.7.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "prisma": "^6.9.0",
+    "qrcode.react": "^4.2.0"
   },
   "description": ""
 }
